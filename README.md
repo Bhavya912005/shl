@@ -1,95 +1,168 @@
-# SHL Assessment Recommendation Engine
 
-This is a simple FastAPI-based recommendation system that suggests relevant SHL assessments based on a job description or natural language query.
 
----
+# 🔍 SHL Assessment Recommendation System
 
-## 🔧 Tech Stack
-- **Python 3.8+**
-- **FastAPI** – for building APIs
-- **Sentence-Transformers** – for text embeddings (semantic matching)
-- **scikit-learn** – for cosine similarity
-- **pandas** – for loading and processing the catalog
-- **uvicorn** – for running FastAPI server
+This project implements a semantic search–based recommendation engine that suggests the most relevant SHL assessments given a job description or natural language query. Built using FastAPI, sentence-transformers, and Streamlit, it enables hiring managers to efficiently identify suitable assessments from SHL’s product catalog.
 
 ---
 
-## Folder Structure
-shl_recommender/
-├── app/
-│ ├── main.py # FastAPI server (API endpoints)
-│ └── recommender.py # Core logic to process and recommend
-├── data/
-│ └── shl_assessment_catalog.csv
-├── requirements.txt
-└── README.md
+## 🛠️ Tech Stack
+
+* 🐍 Python 3.11
+* ⚙️ FastAPI – for API development
+* 🤖 Sentence Transformers (MiniLM-L6-v2) – for semantic similarity
+* 📊 Scikit-learn – for cosine similarity
+* 🧮 Pandas – for data processing
+* 🌐 Streamlit – for frontend UI
+* 🚀 Render – for backend deployment
 
 ---
 
-## How to Run the API Locally
+## 📁 Dataset
 
-### Step 1: Clone the repo or create a new folder
+The SHL product catalog is stored in a structured CSV file with the following columns:
 
-### Step 2: Create virtual environment
+* `name`: Assessment name
+* `url`: SHL product page
+* `duration_minutes`: Duration in minutes
+* `type`: Test type (Technical, Cognitive, Personality, etc.)
+* `remote_support`: Yes/No
+* `adaptive_support`: Yes/No
 
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-venv\Scripts\activate         # Windows
-### Step 3: Install dependencies
-pip install -r requirements.txt
-### Step 4: Run the FastAPI server
+Example:
+
+| name         | type      | duration\_minutes | remote\_support | adaptive\_support |
+| ------------ | --------- | ----------------- | --------------- | ----------------- |
+| Java 8 (New) | Technical | 40                | Yes             | Yes               |
+
+---
+
+## 📐 System Architecture
+
+```text
+[ Query Input ]
+       ↓
+[ Extract filters ]
+       ↓
+[ Filter catalog (duration, type, remote/adaptive) ]
+       ↓
+[ Compute embeddings ]
+       ↓
+[ Rank with cosine similarity ]
+       ↓
+[ Return top 1–10 recommendations ]
+```
+
+---
+
+## 🚀 Deployment
+
+✅ Hosted API on Render:
+
+* Base URL: [https://oa-recommendation.onrender.com](https://oa-recommendation.onrender.com)
+* Swagger UI: [https://oa-recommendation.onrender.com/docs](https://oa-recommendation.onrender.com/docs)
+* Health check: [https://oa-recommendation.onrender.com/health](https://oa-recommendation.onrender.com/health)
+
+Run locally:
+
+
 uvicorn app.main:app --reload
-### Step 5: Test API locally
-Health check: http://127.0.0.1:8000/health
-
-Swagger Docs: http://127.0.0.1:8000/docs
 
 
-API Endpoints
-GET /health
-Check if the API is running
+Example request:
 
-Response:
 
-json
-Copy
-Edit
-{ "status": "OK" }
 POST /recommend
-Takes a job description or natural language query and returns 1–10 relevant SHL assessments.
-
-Input:
-
-json
-Copy
-Edit
 {
-  "query": "I'm hiring for Python developers with strong analytical skills"
+  "query": "Looking for a cognitive and personality test within 40 minutes that supports remote testing"
 }
-Output:
 
-json
-Copy
-Edit
+
+---
+
+## 💻 Streamlit UI
+
+Run locally:
+
+
+streamlit run streamlit_app.py
+
+
+Deployed via Streamlit Cloud :
+[https://bhavya912005-shl-streamlit-app-yrguko.streamlit.app/](https://bhavya912005-shl-streamlit-app-yrguko.streamlit.app/)
+
+---
+
+## 🧪 Evaluation
+
+Implemented metrics:
+
+* 📌 Mean Recall\@3
+* 📌 MAP\@3 (Mean Average Precision)
+
+Code: `app/evaluator.py`
+Evaluation script: `test/test_metrics.py`
+
+Example scores (3 queries):
+
+
+{
+  "Mean Recall@3": 0.67,
+  "MAP@3": 0.61
+}
+
+
+---
+
+## 🧠 Example Output
+
+
 [
   {
-    "name": "Core Java (Entry Level) (New)",
-    "url": "https://...",
+    "name": "HTML5 (New)",
+    "type": "Technical",
+    "duration_minutes": 35,
     "remote_support": "Yes",
     "adaptive_support": "Yes",
-    "duration_minutes": 30,
-    "type": "Technical"
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/html5-new/"
   },
   ...
 ]
-📬 How It Works
-Catalog is loaded from a CSV file (data/shl_assessment_catalog.csv)
 
-Each entry is embedded using sentence-transformers
 
-The user query is embedded and matched to catalog items via cosine similarity
+---
 
-Top matches are returned as JSON
+## 📂 Project Structure
+
+```text
+shl-recommender/
+├── app/
+│   ├── main.py           # FastAPI endpoints
+│   ├── recommender.py    # Recommendation logic
+│   └── evaluator.py      # Evaluation metrics
+├── test/
+│   └── test_metrics.py   # MAP@K, Recall@K testing
+├── data/
+│   └── shl_assessment_catalog.csv
+├── streamlit_app.py      # Streamlit UI
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 📈 Optimizations
+
+* 🔍 Duration, type, and feature filtering before ranking
+* 🧠 Substring matching for test types (e.g. "cognitive" matches "cognitive reasoning")
+* 🛡️ Filter fallback if result set is empty
+* ✅ CORS and error handling for stability
+
+---
+
+
+
+
 
 
 
