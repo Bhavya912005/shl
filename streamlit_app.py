@@ -31,7 +31,7 @@ if st.button("Get Recommendations"):
     else:
         with st.spinner("🔎 Sending query to API..."):
             try:
-                response = requests.post(API_URL, json={"query": query}, timeout=15)
+                response = requests.post(API_URL, json={"query": query}, timeout=75)
 
                 # Show response status and raw text
                 st.write("📬 API Status Code:", response.status_code)
